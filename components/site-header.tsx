@@ -3,8 +3,9 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, MoonStar } from "lucide-react";
+import { Menu } from "lucide-react";
 
+import { Logo } from "@/components/logo";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,10 +30,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <MoonStar className="size-4" />
-          </span>
+        <Link href="/" className="flex items-center gap-2.5">
+          <Logo className="h-8 w-auto text-foreground" />
           <span className="text-lg font-semibold tracking-tight">
             Шейх Иса
           </span>

@@ -33,6 +33,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { Logo } from "@/components/logo";
 import {
   Collapsible,
   CollapsibleContent,
@@ -146,15 +147,13 @@ export function AppSidebar({
   const pathname = usePathname();
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar variant="inset" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <MoonStar className="size-4" />
-                </div>
+                <Logo className="h-8 w-auto shrink-0 text-foreground" />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">Шейх Иса</span>
                   <span className="truncate text-xs text-muted-foreground">
@@ -166,7 +165,7 @@ export function AppSidebar({
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="pt-3 pb-10">
         <SidebarGroup>
           <SidebarGroupLabel>Меню ответов</SidebarGroupLabel>
           <SidebarMenu>
