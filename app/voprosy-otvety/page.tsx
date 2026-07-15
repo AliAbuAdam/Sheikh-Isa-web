@@ -19,7 +19,11 @@ function countLeaves(nodes: typeof answersMenu): number {
   );
 }
 
-export default function Home() {
+export const metadata = {
+  title: "Вопросы и ответы",
+};
+
+export default function AnswersHome() {
   const topicsCount = countLeaves(answersMenu);
 
   return (
@@ -29,7 +33,7 @@ export default function Home() {
           {answersMenu.length} разделов · {topicsCount} тем
         </Badge>
         <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-          База вопросов и ответов
+          Вопросы и ответы
         </h1>
         <p className="max-w-2xl text-muted-foreground text-balance">
           Около трёх тысяч ответов на вопросы по вероубеждению, фикху, манхаджу

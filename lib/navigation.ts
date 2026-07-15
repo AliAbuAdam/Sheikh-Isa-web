@@ -241,6 +241,9 @@ export function getAllNavPaths(): string[][] {
   return paths;
 }
 
+/** Базовый путь раздела «Вопросы-ответы». */
+export const answersBasePath = "/voprosy-otvety";
+
 export function navHref(segments: string[]): string {
-  return `/${segments.join("/")}`;
+  return `${answersBasePath}/${segments.join("/")}`;
 }

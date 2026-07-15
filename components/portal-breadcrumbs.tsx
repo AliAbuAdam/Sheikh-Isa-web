@@ -11,11 +11,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { findNavPath, navHref } from "@/lib/navigation";
+import { answersBasePath, findNavPath, navHref } from "@/lib/navigation";
 
 export function PortalBreadcrumbs() {
   const pathname = usePathname();
-  const segments = pathname.split("/").filter(Boolean);
+  const segments = pathname
+    .replace(answersBasePath, "")
+    .split("/")
+    .filter(Boolean);
   const chain = findNavPath(segments);
 
   return (
@@ -23,9 +26,11 @@ export function PortalBreadcrumbs() {
       <BreadcrumbList>
         <BreadcrumbItem className="hidden md:block">
           {chain?.length ? (
-            <BreadcrumbLink href="/">База ответов</BreadcrumbLink>
+            <BreadcrumbLink href={answersBasePath}>
+              Вопросы-ответы
+            </BreadcrumbLink>
           ) : (
-            <BreadcrumbPage>База ответов</BreadcrumbPage>
+            <BreadcrumbPage>Вопросы-ответы</BreadcrumbPage>
           )}
         </BreadcrumbItem>
         {chain?.map((node, i) => {

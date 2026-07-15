@@ -158,7 +158,7 @@ export function AppSidebar({
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">Шейх Иса</span>
                   <span className="truncate text-xs text-muted-foreground">
-                    База ответов
+                    Вопросы и ответы
                   </span>
                 </div>
               </Link>
