@@ -9,9 +9,8 @@ export function SiteFooter() {
     <footer className="border-t">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center">
             <Logo className="h-7 w-auto text-foreground" />
-            <span className="font-semibold">Шейх Иса</span>
           </div>
           <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
             {siteNav.map((item) => (
