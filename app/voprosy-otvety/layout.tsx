@@ -1,12 +1,8 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
 import { PortalBreadcrumbs } from "@/components/portal-breadcrumbs";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { PortalSidebarReopen } from "@/components/portal-sidebar-reopen";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default function PortalLayout({
   children,
@@ -19,11 +15,7 @@ export default function PortalLayout({
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b">
           <div className="flex w-full items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-vertical:h-4 data-vertical:self-auto"
-            />
+            <PortalSidebarReopen />
             <PortalBreadcrumbs />
             <div className="ml-auto">
               <ModeToggle />

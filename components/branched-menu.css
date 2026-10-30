@@ -1,0 +1,238 @@
+.branched-menu {
+  --bm-ink: var(--sidebar-foreground);
+  --bm-accent: var(--primary);
+  --bm-line: var(--sidebar-border);
+  --bm-muted: color-mix(in srgb, var(--bm-ink) 60%, transparent);
+  --bm-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  position: relative;
+  margin-left: 8px;
+  padding-left: 14px;
+  color: var(--bm-ink);
+  font-size: 14px;
+}
+
+.branched-menu__toolbar {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 8px 8px;
+}
+
+.branched-menu__tool {
+  background: var(--sidebar-accent);
+  color: color-mix(in srgb, var(--sidebar-foreground) 60%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .branched-menu__tool:hover {
+    background: var(--sidebar-accent);
+    color: var(--sidebar-accent-foreground);
+  }
+}
+
+.branched-menu::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  border-radius: 1px;
+  background: linear-gradient(to bottom, var(--bm-line) 0%, var(--bm-line) 55%, transparent 100%);
+}
+
+.branched-menu__marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 2px;
+  height: 16px;
+  border-radius: 1px;
+  background: var(--bm-accent);
+  opacity: 0;
+  transition:
+    top 220ms var(--bm-ease-out),
+    opacity 150ms ease;
+}
+
+.branched-menu__marker[data-on] {
+  opacity: 1;
+}
+
+.branched-menu__sections,
+.branched-menu__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.branched-menu__row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.branched-menu__head,
+.branched-menu__item {
+  flex: 1;
+  min-width: 0;
+  color: var(--bm-muted);
+  overflow-wrap: break-word;
+  outline: none;
+  transition: color 200ms ease;
+}
+
+.branched-menu__head {
+  padding: 8px 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.branched-menu__item {
+  padding: 7px 0 7px 32px;
+  line-height: 18px;
+}
+
+.branched-menu__head[data-in-path],
+.branched-menu__item[data-in-path] {
+  color: var(--bm-ink);
+}
+
+.branched-menu__head[data-active],
+.branched-menu__item[data-active] {
+  color: var(--bm-accent);
+  font-weight: 500;
+}
+
+.branched-menu__head:focus-visible,
+.branched-menu__item:focus-visible {
+  color: var(--bm-ink);
+  text-decoration: underline;
+}
+
+.branched-menu__toggle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 32px;
+  color: var(--bm-muted);
+  cursor: pointer;
+  outline: none;
+  transition: color 200ms ease;
+}
+
+.branched-menu__toggle:focus-visible {
+  color: var(--bm-ink);
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+.branched-menu__toggle svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 200ms ease;
+}
+
+.branched-menu__toggle[data-open] svg {
+  transform: rotate(90deg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .branched-menu__head:hover,
+  .branched-menu__item:hover,
+  .branched-menu__toggle:hover {
+    color: var(--bm-ink);
+  }
+
+  .branched-menu__head[data-active]:hover,
+  .branched-menu__item[data-active]:hover {
+    color: var(--bm-accent);
+  }
+}
+
+.branched-menu__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 300ms var(--bm-ease-out);
+}
+
+.branched-menu__body[data-open] {
+  grid-template-rows: 1fr;
+}
+
+.branched-menu__fold {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.branched-menu__tree {
+  position: relative;
+}
+
+.branched-menu__list {
+  padding: 6px 0;
+}
+
+/* Ствол вложенной ветки стоит под началом подписи родителя. */
+.branched-menu__branch .branched-menu__tree {
+  margin-left: 22px;
+}
+
+.branched-menu__branch {
+  position: relative;
+}
+
+.branched-menu__lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.branched-menu__base,
+.branched-menu__reach {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.branched-menu__base {
+  stroke: var(--bm-line);
+}
+
+.branched-menu__reach {
+  stroke: var(--bm-accent);
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition:
+    stroke-dashoffset 400ms var(--bm-ease-out),
+    opacity 100ms ease 300ms;
+}
+
+.branched-menu__reach[data-on] {
+  stroke-dashoffset: 0;
+  opacity: 1;
+  transition:
+    stroke-dashoffset 400ms var(--bm-ease-out),
+    opacity 100ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .branched-menu__marker {
+    transition: opacity 150ms ease;
+  }
+
+  .branched-menu__body,
+  .branched-menu__reach,
+  .branched-menu__reach[data-on],
+  .branched-menu__toggle svg {
+    transition: none;
+  }
+}
