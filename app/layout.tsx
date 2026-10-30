@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
+import { PlayerDock } from "@/components/lecture-player/player-dock";
+import { PlayerProvider } from "@/components/lecture-player/player-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +39,12 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            <PlayerProvider>
+              {children}
+              <PlayerDock />
+            </PlayerProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

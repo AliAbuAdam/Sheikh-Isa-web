@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Значок разработки перекрывает кнопку воспроизведения в пульте плеера.
+  devIndicators: false,
 };
 
 export default nextConfig;
