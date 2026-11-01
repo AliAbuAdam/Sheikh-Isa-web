@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
@@ -26,8 +27,8 @@ export function PortalBreadcrumbs() {
       <BreadcrumbList>
         <BreadcrumbItem className="hidden md:block">
           {chain?.length ? (
-            <BreadcrumbLink href={answersBasePath}>
-              Вопросы-ответы
+            <BreadcrumbLink asChild>
+              <Link href={answersBasePath}>Вопросы-ответы</Link>
             </BreadcrumbLink>
           ) : (
             <BreadcrumbPage>Вопросы-ответы</BreadcrumbPage>
@@ -43,7 +44,9 @@ export function PortalBreadcrumbs() {
                 {isLast ? (
                   <BreadcrumbPage>{node.title}</BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink href={href}>{node.title}</BreadcrumbLink>
+                  <BreadcrumbLink asChild>
+                    <Link href={href}>{node.title}</Link>
+                  </BreadcrumbLink>
                 )}
               </BreadcrumbItem>
             </React.Fragment>
