@@ -12,6 +12,8 @@ import {
 } from "react";
 
 import { lectures, type Lecture } from "@/lib/lecture-player/lectures";
+import { toPositionState } from "@/lib/lecture-player/media-session";
+import { JUMP_SECONDS } from "@/lib/lecture-player/physics";
 import { nextSpeed } from "@/lib/lecture-player/playback-speed";
 
 type PlayerContextValue = {
@@ -105,18 +107,58 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     return () => channel.close();
   }, []);
 
+  const syncPosition = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio || !("mediaSession" in navigator)) return;
+    const state = toPositionState(
+      audio.duration,
+      audio.currentTime,
+      audio.playbackRate,
+    );
+    if (state) navigator.mediaSession.setPositionState(state);
+  }, []);
+
+  // Управление с экрана блокировки и из шторки уведомлений.
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
     const session = navigator.mediaSession;
     session.metadata = current
-      ? new MediaMetadata({ title: current.title, artist: "Шейх Иса" })
+      ? new MediaMetadata({
+          title: current.title,
+          artist: "Шейх Иса",
+          artwork: [
+            { src: "/player-artwork.png", sizes: "512x512", type: "image/png" },
+          ],
+        })
       : null;
-    session.setActionHandler("play", () => audioRef.current?.play());
+    const seekBy = (seconds: number) => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      seek(Math.max(audio.currentTime + seconds, 0));
+    };
+    session.setActionHandler("play", () => {
+      audioRef.current?.play().catch(() => {});
+    });
     session.setActionHandler("pause", () => audioRef.current?.pause());
+    session.setActionHandler("seekbackward", (details) =>
+      seekBy(-(details.seekOffset ?? JUMP_SECONDS)),
+    );
+    session.setActionHandler("seekforward", (details) =>
+      seekBy(details.seekOffset ?? JUMP_SECONDS),
+    );
     session.setActionHandler("seekto", (details) => {
       if (details.seekTime !== undefined) seek(details.seekTime);
     });
   }, [current, seek]);
+
+  useEffect(() => {
+    if (!("mediaSession" in navigator)) return;
+    navigator.mediaSession.playbackState = !current
+      ? "none"
+      : isPlaying
+        ? "playing"
+        : "paused";
+  }, [current, isPlaying]);
 
   const value = useMemo(() => {
     const index = current
@@ -157,9 +199,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         preload="metadata"
         onPlay={() => {
           setIsPlaying(true);
+          syncPosition();
           channelRef.current?.postMessage("playing");
         }}
-        onPause={() => setIsPlaying(false)}
+        onPause={() => {
+          setIsPlaying(false);
+          syncPosition();
+        }}
+        onLoadedMetadata={syncPosition}
+        onSeeked={syncPosition}
+        onRateChange={syncPosition}
         onError={() => {
           if (audioRef.current?.getAttribute("src")) setHasError(true);
         }}

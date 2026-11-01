@@ -226,6 +226,39 @@ body:has(.player-dock) {
   cursor: default;
 }
 
+/* На телефоне кнопки крупнее, чтобы удобнее попадать пальцем. */
+@media (max-width: 639px) {
+  .wave-seekbar__round {
+    width: 38px;
+    height: 38px;
+  }
+
+  .wave-seekbar__round svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .wave-seekbar__round--main {
+    width: 48px;
+    height: 48px;
+  }
+
+  .wave-seekbar__round--main svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .wave-seekbar__ghost {
+    width: 34px;
+    height: 34px;
+  }
+
+  .wave-seekbar__ghost svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+
 .wave-seekbar__footer {
   position: absolute;
   bottom: 3px;
