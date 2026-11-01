@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ChevronUp, Gauge, Pause, Play, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Gauge, X } from "lucide-react";
 
+import { SharpPause, SharpPlay } from "@/components/lecture-player/icons";
 import { usePlayer } from "@/components/lecture-player/player-provider";
 import { WaveSeekbar } from "@/components/lecture-player/wave-seekbar";
 import { Button } from "@/components/ui/button";
 import { formatSpeed } from "@/lib/lecture-player/playback-speed";
 import { formatTime } from "@/lib/lecture-player/physics";
+import { cn } from "@/lib/utils";
 
 import "./player.css";
 
@@ -95,11 +97,7 @@ export function PlayerDock() {
               <span className="player-dock__format">{current.format}</span>
             ) : null}
           </div>
-          <WaveSeekbar
-            key={current.id}
-            lecture={current}
-            expanded={expanded}
-          />
+          <WaveSeekbar key={current.id} lecture={current} />
         </div>
       </div>
       <div className="relative flex h-[50px] items-center gap-2 px-3 sm:gap-3 sm:px-4">
@@ -115,11 +113,7 @@ export function PlayerDock() {
           aria-label={isPlaying ? "Пауза" : "Воспроизвести"}
           onClick={togglePlay}
         >
-          {isPlaying ? (
-            <Pause className="fill-current" />
-          ) : (
-            <Play className="fill-current" />
-          )}
+          {isPlaying ? <SharpPause /> : <SharpPlay />}
         </Button>
         <button
           type="button"
@@ -132,7 +126,10 @@ export function PlayerDock() {
           </span>
           <span
             ref={timeRef}
-            className="block text-xs text-muted-foreground tabular-nums"
+            className={cn(
+              "block text-xs text-muted-foreground tabular-nums",
+              expanded && !hasError && "hidden",
+            )}
           >
             {hasError ? "Не удалось загрузить запись" : "0:00"}
           </span>

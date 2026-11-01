@@ -2,14 +2,13 @@
 
 import { useCallback, useEffect, useRef, type PointerEvent, type ReactNode } from "react";
 import {
-  FastForward,
-  Pause,
-  Play,
-  Rewind,
-  SkipBack,
-  SkipForward,
-} from "lucide-react";
-
+  SharpFastForward,
+  SharpPause,
+  SharpPlay,
+  SharpRewind,
+  SharpSkipBack,
+  SharpSkipForward,
+} from "@/components/lecture-player/icons";
 import { usePlayer } from "@/components/lecture-player/player-provider";
 import type { Lecture } from "@/lib/lecture-player/lectures";
 import {
@@ -36,7 +35,6 @@ type Mode = "follow" | "drag" | "fling" | "glide" | "hold" | "wheel";
 
 const BAR_WIDTH = 5;
 const WHEEL_COMMIT_MS = 180;
-const CONTROLS_IDLE_MS = 3000;
 
 function SeekButton({
   label,
@@ -91,13 +89,7 @@ function SeekButton({
   );
 }
 
-export function WaveSeekbar({
-  lecture,
-  expanded,
-}: {
-  lecture: Lecture;
-  expanded: boolean;
-}) {
+export function WaveSeekbar({ lecture }: { lecture: Lecture }) {
   const { isPlaying, togglePlay, seek, getTime, previous, next, playLecture } =
     usePlayer();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -116,9 +108,7 @@ export function WaveSeekbar({
     startTime: 0,
     samples: [] as PointerSample[],
     wheelTimer: 0,
-    wasIdle: false,
   });
-  const idleTimer = useRef(0);
 
   const barSeconds = lecture.duration / lecture.peaks.length;
   const secondsPerPixel = barSeconds / BAR_PITCH;
@@ -127,42 +117,13 @@ export function WaveSeekbar({
     rootRef.current?.toggleAttribute("data-scrubbing", on);
   };
 
-  const wakeControls = useCallback(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    root.removeAttribute("data-idle");
-    clearTimeout(idleTimer.current);
-    const schedule = () => {
-      idleTimer.current = window.setTimeout(() => {
-        const busy =
-          motion.current.mode === "hold" ||
-          root.querySelector("button:focus-visible") ||
-          (matchMedia("(hover: hover)").matches &&
-            root.querySelector(".wave-seekbar__controls button:hover"));
-        if (busy) schedule();
-        else root.setAttribute("data-idle", "");
-      }, CONTROLS_IDLE_MS);
-    };
-    schedule();
-  }, []);
-
-  const sleepControls = useCallback(() => {
-    clearTimeout(idleTimer.current);
-    rootRef.current?.setAttribute("data-idle", "");
-  }, []);
-
   const commit = useCallback(() => {
     const m = motion.current;
     m.mode = "follow";
     m.position = clamp(m.position, 0, lecture.duration);
     seek(Math.min(m.position, lecture.duration - 0.1));
     rootRef.current?.removeAttribute("data-scrubbing");
-    wakeControls();
-  }, [lecture.duration, seek, wakeControls]);
-
-  useEffect(() => {
-    if (expanded) wakeControls();
-  }, [expanded, wakeControls]);
+  }, [lecture.duration, seek]);
 
   const glide = (target: number) => {
     const m = motion.current;
@@ -177,7 +138,6 @@ export function WaveSeekbar({
     if (!canvas || !context || !root) return;
     const m = motion.current;
     m.position = getTime();
-    wakeControls();
 
     let frame = 0;
     let previousTime = 0;
@@ -212,8 +172,15 @@ export function WaveSeekbar({
       if (!root.parentElement?.clientHeight) return;
       const { width, height } = canvas.getBoundingClientRect();
       const ratio = window.devicePixelRatio || 1;
-      const color = getComputedStyle(canvas).color;
-      const signature = [m.position, width, height, color].join();
+      const { fill: playedColor, stroke: upcomingColor } =
+        getComputedStyle(canvas);
+      const signature = [
+        m.position,
+        width,
+        height,
+        playedColor,
+        upcomingColor,
+      ].join();
       if (signature === drawn) return;
       drawn = signature;
 
@@ -225,7 +192,6 @@ export function WaveSeekbar({
       }
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
       context.clearRect(0, 0, width, height);
-      context.fillStyle = color;
 
       const center = width / 2;
       const amplitude = height * 0.66;
@@ -239,10 +205,10 @@ export function WaveSeekbar({
         const x = center + ((i * barSeconds - m.position) / barSeconds) * BAR_PITCH;
         const barHeight = Math.max(4, lecture.peaks[i] * amplitude);
         const played = (i + 1) * barSeconds <= m.position;
-        const fade = played
-          ? 0.34 * (1 - (0.7 * Math.abs(x - center)) / Math.max(center, 1))
-          : 0.9;
-        context.globalAlpha = fade;
+        context.fillStyle = played ? playedColor : upcomingColor;
+        context.globalAlpha = played
+          ? 1 - (0.7 * Math.abs(x - center)) / Math.max(center, 1)
+          : 1;
         context.beginPath();
         context.roundRect(
           x,
@@ -278,7 +244,6 @@ export function WaveSeekbar({
       if (m.mode !== "wheel") {
         m.mode = "wheel";
         root.setAttribute("data-scrubbing", "");
-        sleepControls();
       }
       m.position = clamp(
         m.position + event.deltaX * secondsPerPixel,
@@ -293,18 +258,9 @@ export function WaveSeekbar({
     return () => {
       cancelAnimationFrame(frame);
       clearTimeout(m.wheelTimer);
-      clearTimeout(idleTimer.current);
       canvas.removeEventListener("wheel", onWheel);
     };
-  }, [
-    lecture,
-    barSeconds,
-    secondsPerPixel,
-    getTime,
-    commit,
-    wakeControls,
-    sleepControls,
-  ]);
+  }, [lecture, barSeconds, secondsPerPixel, getTime, commit]);
 
   const onPointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     const m = motion.current;
@@ -315,8 +271,6 @@ export function WaveSeekbar({
     m.raw = m.position;
     m.startTime = event.timeStamp;
     m.samples = [{ x: event.clientX, t: event.timeStamp }];
-    m.wasIdle = Boolean(rootRef.current?.hasAttribute("data-idle"));
-    sleepControls();
     setScrubbing(true);
   };
 
@@ -338,12 +292,6 @@ export function WaveSeekbar({
     if (isTap) {
       const { left, width } = event.currentTarget.getBoundingClientRect();
       setScrubbing(false);
-      wakeControls();
-      // На сенсорном экране первое касание только возвращает скрытые кнопки.
-      if (event.pointerType !== "mouse" && m.wasIdle) {
-        m.mode = "follow";
-        return;
-      }
       glide(
         m.startPosition +
           (event.clientX - left - width / 2) * secondsPerPixel,
@@ -367,7 +315,6 @@ export function WaveSeekbar({
   const onPointerCancel = () => {
     motion.current.mode = "follow";
     setScrubbing(false);
-    wakeControls();
   };
 
   const startHold = (direction: number) => {
@@ -391,22 +338,7 @@ export function WaveSeekbar({
       aria-valuemin={0}
       aria-valuemax={Math.floor(lecture.duration)}
       aria-valuenow={0}
-      onPointerMove={(event) => {
-        if (event.pointerType === "mouse" && motion.current.mode !== "drag") {
-          wakeControls();
-        }
-      }}
-      onPointerDownCapture={(event) => {
-        if ((event.target as Element).closest("button")) wakeControls();
-      }}
-      onPointerUpCapture={(event) => {
-        if ((event.target as Element).closest("button")) wakeControls();
-      }}
-      onFocus={(event) => {
-        if (event.target.matches(":focus-visible")) wakeControls();
-      }}
       onKeyDown={(event) => {
-        wakeControls();
         if (event.target !== event.currentTarget) return;
         if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
           event.preventDefault();
@@ -435,7 +367,7 @@ export function WaveSeekbar({
           disabled={!previous}
           onClick={() => previous && playLecture(previous)}
         >
-          <SkipBack aria-hidden="true" />
+          <SharpSkipBack />
         </button>
         <SeekButton
           label={`Назад на ${JUMP_SECONDS} секунд, удерживайте для перемотки`}
@@ -443,7 +375,7 @@ export function WaveSeekbar({
           onHoldStart={() => startHold(-1)}
           onHoldEnd={commit}
         >
-          <Rewind aria-hidden="true" />
+          <SharpRewind />
         </SeekButton>
         <button
           type="button"
@@ -451,7 +383,7 @@ export function WaveSeekbar({
           aria-label={isPlaying ? "Пауза" : "Воспроизвести"}
           onClick={togglePlay}
         >
-          {isPlaying ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}
+          {isPlaying ? <SharpPause /> : <SharpPlay />}
         </button>
         <SeekButton
           label={`Вперёд на ${JUMP_SECONDS} секунд, удерживайте для перемотки`}
@@ -459,7 +391,7 @@ export function WaveSeekbar({
           onHoldStart={() => startHold(1)}
           onHoldEnd={commit}
         >
-          <FastForward aria-hidden="true" />
+          <SharpFastForward />
         </SeekButton>
         <button
           type="button"
@@ -468,16 +400,14 @@ export function WaveSeekbar({
           disabled={!next}
           onClick={() => next && playLecture(next)}
         >
-          <SkipForward aria-hidden="true" />
+          <SharpSkipForward />
         </button>
       </div>
       <div className="wave-seekbar__footer">
-        <span ref={elapsedRef} className="wave-seekbar__time">
+        <span ref={elapsedRef} className="wave-seekbar__elapsed">
           0:00
         </span>
-        <span className="wave-seekbar__time">
-          {formatTime(lecture.duration)}
-        </span>
+        {` / ${formatTime(lecture.duration)}`}
       </div>
     </div>
   );

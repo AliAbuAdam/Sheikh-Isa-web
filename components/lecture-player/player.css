@@ -99,6 +99,14 @@ body:has(.player-dock) {
   height: 100%;
   cursor: grab;
   touch-action: pan-y;
+  /* Цвета волны для canvas: fill — сыгранная часть, stroke — оставшаяся. */
+  fill: color-mix(in srgb, var(--foreground) 24%, transparent);
+  stroke: oklch(0.4 0 0);
+}
+
+.dark .wave-seekbar__canvas {
+  fill: color-mix(in srgb, var(--foreground) 34%, transparent);
+  stroke: color-mix(in srgb, var(--foreground) 90%, transparent);
 }
 
 .wave-seekbar[data-scrubbing] .wave-seekbar__canvas {
@@ -140,19 +148,17 @@ body:has(.player-dock) {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  opacity: 0.7;
+  gap: 4px;
+  padding-top: 26px;
   pointer-events: none;
   transition: opacity 180ms ease;
 }
 
-.wave-seekbar[data-scrubbing] .wave-seekbar__controls,
-.wave-seekbar[data-idle] .wave-seekbar__controls {
+.wave-seekbar[data-scrubbing] .wave-seekbar__controls {
   opacity: 0;
 }
 
-.wave-seekbar[data-scrubbing] .wave-seekbar__controls button,
-.wave-seekbar[data-idle] .wave-seekbar__controls button {
+.wave-seekbar[data-scrubbing] .wave-seekbar__controls button {
   pointer-events: none;
 }
 
@@ -180,38 +186,38 @@ body:has(.player-dock) {
 }
 
 .wave-seekbar__round {
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   background: var(--foreground);
   color: var(--background);
 }
 
 .wave-seekbar__round svg {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   fill: currentColor;
 }
 
 .wave-seekbar__round--main {
-  width: 52px;
-  height: 52px;
+  width: 42px;
+  height: 42px;
 }
 
 .wave-seekbar__round--main svg {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
 }
 
 .wave-seekbar__ghost {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   color: var(--foreground);
   background: color-mix(in srgb, var(--foreground) 12%, transparent);
 }
 
 .wave-seekbar__ghost svg {
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   fill: currentColor;
 }
 
@@ -222,26 +228,18 @@ body:has(.player-dock) {
 
 .wave-seekbar__footer {
   position: absolute;
-  right: 8px;
-  bottom: 6px;
-  left: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  bottom: 3px;
+  left: 12px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 14px;
   pointer-events: none;
 }
 
-.wave-seekbar__time {
-  min-width: 40px;
-  padding: 2px 7px;
-  border-radius: 999px;
-  background: var(--foreground);
-  color: var(--background);
-  font-size: 11px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
+.wave-seekbar__elapsed {
+  color: var(--foreground);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,7 +1,6 @@
 "use client";
 
-import { Pause, Play } from "lucide-react";
-
+import { SharpPause, SharpPlay } from "@/components/lecture-player/icons";
 import { usePlayer } from "@/components/lecture-player/player-provider";
 import { Button } from "@/components/ui/button";
 import { lectures } from "@/lib/lecture-player/lectures";
@@ -25,11 +24,7 @@ export function LectureList() {
               aria-label={`${isThisPlaying ? "Пауза" : "Воспроизвести"}: ${lecture.title}`}
               onClick={() => playLecture(lecture)}
             >
-              {isThisPlaying ? (
-                <Pause className="fill-current" />
-              ) : (
-                <Play className="fill-current" />
-              )}
+              {isThisPlaying ? <SharpPause /> : <SharpPlay />}
             </Button>
             <span className="min-w-0 flex-1 truncate font-medium">
               {lecture.title}
