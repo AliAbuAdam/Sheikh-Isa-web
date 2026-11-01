@@ -14,7 +14,7 @@ export function PortalSidebarReopen() {
       <SidebarTrigger className="-ml-1" />
       <Separator
         orientation="vertical"
-        className="mr-2 data-vertical:h-4 data-vertical:self-auto"
+        className="data-vertical:h-4 data-vertical:self-auto"
       />
     </>
   );

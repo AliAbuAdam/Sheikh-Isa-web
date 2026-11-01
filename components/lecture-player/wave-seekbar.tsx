@@ -127,14 +127,6 @@ export function WaveSeekbar({
     rootRef.current?.toggleAttribute("data-scrubbing", on);
   };
 
-  const commit = useCallback(() => {
-    const m = motion.current;
-    m.mode = "follow";
-    m.position = clamp(m.position, 0, lecture.duration);
-    seek(Math.min(m.position, lecture.duration - 0.1));
-    rootRef.current?.removeAttribute("data-scrubbing");
-  }, [lecture.duration, seek]);
-
   const wakeControls = useCallback(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -158,6 +150,15 @@ export function WaveSeekbar({
     clearTimeout(idleTimer.current);
     rootRef.current?.setAttribute("data-idle", "");
   }, []);
+
+  const commit = useCallback(() => {
+    const m = motion.current;
+    m.mode = "follow";
+    m.position = clamp(m.position, 0, lecture.duration);
+    seek(Math.min(m.position, lecture.duration - 0.1));
+    rootRef.current?.removeAttribute("data-scrubbing");
+    wakeControls();
+  }, [lecture.duration, seek, wakeControls]);
 
   useEffect(() => {
     if (expanded) wakeControls();

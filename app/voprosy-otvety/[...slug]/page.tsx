@@ -37,7 +37,7 @@ export default async function SectionPage({
   const node = chain[chain.length - 1];
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
+    <div className="mx-auto w-full max-w-5xl px-4 pt-6 pb-10 sm:px-6">
       <div className="mb-8 space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           {node.title}

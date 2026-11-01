@@ -25,7 +25,7 @@ export function PortalBreadcrumbs() {
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbItem className="hidden md:block">
+        <BreadcrumbItem>
           {chain?.length ? (
             <BreadcrumbLink asChild>
               <Link href={answersBasePath}>Вопросы-ответы</Link>
@@ -39,7 +39,7 @@ export function PortalBreadcrumbs() {
           const href = navHref(segments.slice(0, i + 1));
           return (
             <React.Fragment key={href}>
-              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbSeparator />
               <BreadcrumbItem>
                 {isLast ? (
                   <BreadcrumbPage>{node.title}</BreadcrumbPage>

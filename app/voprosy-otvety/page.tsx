@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { answersMenu, navHref } from "@/lib/navigation";
 
 function countLeaves(nodes: typeof answersMenu): number {
@@ -27,7 +26,7 @@ export default function AnswersHome() {
   const topicsCount = countLeaves(answersMenu);
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 md:py-16">
+    <div className="mx-auto w-full max-w-5xl px-4 pt-6 pb-10 sm:px-6 md:pb-16">
       <div className="mb-10 space-y-4">
         <Badge variant="secondary">
           {answersMenu.length} разделов · {topicsCount} тем
@@ -40,14 +39,6 @@ export default function AnswersHome() {
           и другим разделам. Выберите раздел в меню слева или воспользуйтесь
           поиском.
         </p>
-        <div className="relative max-w-md">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            className="pl-9"
-            placeholder="Поиск по ответам (скоро)"
-            disabled
-          />
-        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
