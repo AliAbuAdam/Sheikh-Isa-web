@@ -1,3 +1,13 @@
+const DEFAULT_COVERS = {
+  light: "/player-cover-light.png",
+  dark: "/player-cover-dark.png",
+};
+
+/** Обложка записи, а без неё — логотип в цветах текущей темы сайта. */
+export function coverFor(cover: string | undefined, theme: string | undefined) {
+  return cover ?? (theme === "dark" ? DEFAULT_COVERS.dark : DEFAULT_COVERS.light);
+}
+
 /**
  * Позиция для экрана блокировки. setPositionState бросает исключение,
  * если позиция больше длительности, поэтому значения приводятся к допустимым.

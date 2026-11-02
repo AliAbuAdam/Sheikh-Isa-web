@@ -10,11 +10,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useTheme } from "next-themes";
 
+import { usePlaylist } from "@/components/lecture-player/use-playlist";
 import { lectures, type Lecture } from "@/lib/lecture-player/lectures";
-import { toPositionState } from "@/lib/lecture-player/media-session";
+import { coverFor, toPositionState } from "@/lib/lecture-player/media-session";
 import { JUMP_SECONDS } from "@/lib/lecture-player/physics";
 import { nextSpeed } from "@/lib/lecture-player/playback-speed";
+
+type Queue = "catalog" | "playlist";
 
 type PlayerContextValue = {
   current: Lecture | null;
@@ -24,7 +28,7 @@ type PlayerContextValue = {
   cycleSpeed: () => void;
   previous: Lecture | null;
   next: Lecture | null;
-  playLecture: (lecture: Lecture) => void;
+  playLecture: (lecture: Lecture, queue?: Queue) => void;
   togglePlay: () => void;
   seek: (seconds: number) => void;
   getTime: () => number;
@@ -50,6 +54,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const [queue, setQueue] = useState<Queue>("catalog");
+  const { items: playlistItems } = usePlaylist();
+  const { resolvedTheme } = useTheme();
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -59,9 +66,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const playLecture = useCallback(
-    (lecture: Lecture) => {
+    (lecture: Lecture, nextQueue?: Queue) => {
       const audio = audioRef.current;
       if (!audio) return;
+      if (nextQueue) setQueue(nextQueue);
       if (lecture.id === current?.id) {
         togglePlay();
         return;
@@ -118,19 +126,33 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     if (state) navigator.mediaSession.setPositionState(state);
   }, []);
 
-  // Управление с экрана блокировки и из шторки уведомлений.
+  const queueItems = queue === "playlist" ? playlistItems : lectures;
+  const queueIndex = current
+    ? queueItems.findIndex((lecture) => lecture.id === current.id)
+    : -1;
+  const previous = queueIndex > 0 ? queueItems[queueIndex - 1] : null;
+  const next = queueIndex >= 0 ? (queueItems[queueIndex + 1] ?? null) : null;
+
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
-    const session = navigator.mediaSession;
-    session.metadata = current
+    navigator.mediaSession.metadata = current
       ? new MediaMetadata({
           title: current.title,
           artist: "Шейх Иса",
           artwork: [
-            { src: "/player-artwork.png", sizes: "512x512", type: "image/png" },
+            {
+              src: coverFor(current.cover, resolvedTheme),
+              sizes: "512x512",
+            },
           ],
         })
       : null;
+  }, [current, resolvedTheme]);
+
+  // Управление с экрана блокировки и из шторки уведомлений.
+  useEffect(() => {
+    if (!("mediaSession" in navigator)) return;
+    const session = navigator.mediaSession;
     const seekBy = (seconds: number) => {
       const audio = audioRef.current;
       if (!audio) return;
@@ -149,7 +171,15 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     session.setActionHandler("seekto", (details) => {
       if (details.seekTime !== undefined) seek(details.seekTime);
     });
-  }, [current, seek]);
+    session.setActionHandler(
+      "previoustrack",
+      previous ? () => playLecture(previous) : null,
+    );
+    session.setActionHandler(
+      "nexttrack",
+      next ? () => playLecture(next) : null,
+    );
+  }, [seek, previous, next, playLecture]);
 
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
@@ -161,17 +191,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, [current, isPlaying]);
 
   const value = useMemo(() => {
-    const index = current
-      ? lectures.findIndex((lecture) => lecture.id === current.id)
-      : -1;
     return {
       current,
       isPlaying,
       hasError,
       speed,
       cycleSpeed,
-      previous: index > 0 ? lectures[index - 1] : null,
-      next: index >= 0 ? (lectures[index + 1] ?? null) : null,
+      previous,
+      next,
       playLecture,
       togglePlay,
       seek,
@@ -184,6 +211,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     hasError,
     speed,
     cycleSpeed,
+    previous,
+    next,
     playLecture,
     togglePlay,
     seek,
@@ -205,6 +234,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         onPause={() => {
           setIsPlaying(false);
           syncPosition();
+        }}
+        onEnded={() => {
+          if (queue === "playlist" && next) playLecture(next);
         }}
         onLoadedMetadata={syncPosition}
         onSeeked={syncPosition}

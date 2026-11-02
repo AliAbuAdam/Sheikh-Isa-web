@@ -1,7 +1,17 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { toPositionState } from "./media-session.ts";
+import { coverFor, toPositionState } from "./media-session.ts";
+
+test("coverFor prefers the recording's own cover", () => {
+  assert.equal(coverFor("/books/fiqh.png", "dark"), "/books/fiqh.png");
+});
+
+test("coverFor falls back to the logo in the site theme", () => {
+  assert.equal(coverFor(undefined, "dark"), "/player-cover-dark.png");
+  assert.equal(coverFor(undefined, "light"), "/player-cover-light.png");
+  assert.equal(coverFor(undefined, undefined), "/player-cover-light.png");
+});
 
 test("toPositionState passes valid values through", () => {
   assert.deepEqual(toPositionState(100, 30, 1.5), {
