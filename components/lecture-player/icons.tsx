@@ -51,3 +51,20 @@ export function SharpPause() {
     </svg>
   );
 }
+
+export function PlaylistIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <path d="M3 6h12M3 12h8M3 18h8" />
+      <polygon points="15,11 22,15.5 15,20" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}

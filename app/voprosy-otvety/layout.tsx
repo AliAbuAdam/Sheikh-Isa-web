@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
+import { PlaylistButton } from "@/components/lecture-player/playlist-button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { PortalBreadcrumbs } from "@/components/portal-breadcrumbs";
 import { PortalSidebarReopen } from "@/components/portal-sidebar-reopen";
@@ -21,19 +22,20 @@ export default function PortalLayout({
           <div className="flex items-center gap-2 pl-4 empty:pl-0">
             <PortalSidebarReopen />
           </div>
-          <div className="pr-14 pl-2 sm:pr-16 sm:pl-6">
+          <div className="pr-24 pl-2 sm:pr-24 sm:pl-6">
             <div className="relative w-full max-w-md min-w-0">
               <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 className="pl-9"
-                placeholder="Поиск по ответам (скоро)"
+                placeholder="Поиск (скоро)"
                 aria-label="Поиск по ответам"
                 disabled
               />
             </div>
           </div>
           <div />
-          <div className="absolute top-1/2 right-4 -translate-y-1/2 sm:right-6">
+          <div className="absolute top-1/2 right-4 flex -translate-y-1/2 items-center gap-1 sm:right-6">
+            <PlaylistButton />
             <ModeToggle />
           </div>
         </header>

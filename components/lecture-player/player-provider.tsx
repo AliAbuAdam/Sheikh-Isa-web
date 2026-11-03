@@ -33,6 +33,8 @@ type PlayerContextValue = {
   seek: (seconds: number) => void;
   getTime: () => number;
   close: () => void;
+  playlistOpen: boolean;
+  setPlaylistOpen: (open: boolean | ((open: boolean) => boolean)) => void;
 };
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -55,6 +57,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [hasError, setHasError] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [queue, setQueue] = useState<Queue>("catalog");
+  const [playlistOpen, setPlaylistOpen] = useState(false);
   const { items: playlistItems } = usePlaylist();
   const { resolvedTheme } = useTheme();
 
@@ -204,6 +207,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       seek,
       getTime,
       close,
+      playlistOpen,
+      setPlaylistOpen,
     };
   }, [
     current,
@@ -218,6 +223,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     seek,
     getTime,
     close,
+    playlistOpen,
   ]);
 
   return (
